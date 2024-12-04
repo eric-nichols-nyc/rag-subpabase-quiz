@@ -2,45 +2,53 @@
 import React, { useEffect, useState } from 'react'
 import {Quiz} from './Quiz'
 import { QuizProps } from '../../types/quiz'
+
 const QuizGallery = ({id}: {id: string}) => {
     const [quizData, setQuizData] = useState<QuizProps | null>(null)
-    const getQuiz = async () => {
-        try {
-          console.log("Starting getQuiz with id:", id)
-          
-          // For server components in Next.js 14, we should use this pattern
-          const response = await fetch(`/api/quiz/${id}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            next: { revalidate: 0 }, // Instead of cache: 'no-store'
-          })
-          
-          if (response.status === 404) {
-            console.log("Quiz not found")
-          }
-      
-          if (!response.ok) {
-            throw new Error('Failed to fetch quiz')
-          }
-      
-          const result = await response.json()
-          console.log(result)
-          setQuizData(result)
-        } catch (error) {
-          console.error("Error in getQuiz:", error)
-          throw error
-        }
-      }
+    const [isLoading, setIsLoading] = useState(true)
+    
     useEffect(() => {
+        const getQuiz = async () => {
+            try {
+                setIsLoading(true)
+                console.log("Starting getQuiz with id:", id)
+                const response = await fetch(`/api/quiz/${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    next: { revalidate: 0 },
+                })
+                
+                if (response.status === 404) {
+                    console.log("Quiz not found")
+                }
+            
+                if (!response.ok) {
+                    throw new Error('Failed to fetch quiz')
+                }
+            
+                const result = await response.json()
+                console.log(result)
+                setQuizData(result)
+            } catch (error) {
+                console.error("Error in getQuiz:", error)
+                throw error
+            } finally {
+                setIsLoading(false)
+            }
+        }
+        
         getQuiz()
-    }, [])
-  return (
-    <div>
-        {quizData && <Quiz quizData={quizData} />}
-    </div>
-  )
+    }, [id])
+
+    if (isLoading) {
+        return <div className="flex justify-center items-center min-h-[200px]">Loading quiz...</div>
+    }
+
+    return (
+        <div><Quiz quizData={quizData} /></div>
+    )
 }
 
 export default QuizGallery

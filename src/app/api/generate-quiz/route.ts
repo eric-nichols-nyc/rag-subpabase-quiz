@@ -57,7 +57,6 @@ export async function POST(request: NextRequest) {
 
         // Combine chunks for processing
         const fullContent = chunks.map(chunk => chunk.content).join(' ');
-        console.log('Content length:', fullContent.length); // Verify we have content
 
         // 4. Generate quiz using OpenAI
         const completion = await openai.chat.completions.create({
