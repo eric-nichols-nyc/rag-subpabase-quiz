@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Question } from "@prisma/client";
 
 interface ResultsProps {
   score: number;
@@ -7,7 +8,19 @@ interface ResultsProps {
   onRestart: () => void;
 }
 
-export function Results({ score, totalQuestions, onRestart }: ResultsProps) {
+export function Results({ 
+  score, 
+  totalQuestions, 
+  onRestart, 
+  questions, 
+  userAnswers 
+}: { 
+  score: number;
+  totalQuestions: number;
+  onRestart: () => void;
+  questions: Question[];
+  userAnswers: (string | null)[];
+}) {
   const percentage = Math.round((score / totalQuestions) * 100)
 
   return (
@@ -16,9 +29,40 @@ export function Results({ score, totalQuestions, onRestart }: ResultsProps) {
         <CardTitle>Quiz Results</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-2xl font-bold text-center">
+      <p className="text-2xl font-bold text-center">
           You scored {score} out of {totalQuestions} ({percentage}%)
         </p>
+        
+        <div className="space-y-6">
+          {questions.map((question, index) => (
+            <div 
+              key={index} 
+              className={`p-4 rounded-lg border ${
+                userAnswers[index] === question.correct_answer 
+                  ? 'bg-green-50 border-green-200'
+                  : 'bg-red-50 border-red-200'
+              }`}
+            >
+              <h3 className="font-semibold mb-2">{index + 1}. {question.question}</h3>
+              <div className="ml-4 space-y-2">
+                <p>
+                  <span className="font-medium">Your answer: </span>
+                  {userAnswers[index]}
+                </p>
+                {userAnswers[index] !== question.correct_answer && (
+                  <p className="text-green-700">
+                    <span className="font-medium">Correct answer: </span>
+                    {question.correct_answer}
+                  </p>
+                )}
+                <p className="text-gray-600 mt-2">
+                  <span className="font-medium">Explanation: </span>
+                  {question.explanation}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
       </CardContent>
       <CardFooter className="flex justify-center">
         <Button onClick={onRestart}>Restart Quiz</Button>

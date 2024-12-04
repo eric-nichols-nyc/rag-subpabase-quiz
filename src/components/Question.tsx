@@ -11,26 +11,30 @@ interface QuestionProps {
   onAnswer: (isCorrect: boolean) => void;
 }
 
-export function QuizQuestion({ question, onAnswer }: QuestionProps) {
+export function QuizQuestion({ 
+  question, 
+  onAnswerSelected, 
+  userAnswer 
+}: { 
+  question: Question; 
+  onAnswerSelected: (answer: string) => void;
+  userAnswer: string | null;
+}) {
+  const shuffleArray = (array: string[]) => {
+    const newArray = [...array];
+    for (let i = newArray.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+    }
+    return newArray;
+  };
+
+  const shuffledOptions =  shuffleArray(question.options);
 
   useEffect(() => {
-    setShowExplanation(false)
-    setSelectedAnswer(null)
-  }, [question]) 
+    console.log('shuffledOptions', shuffledOptions)
+  }, [shuffledOptions])
 
-  
-  console.log(question.options)
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
-  const [showExplanation, setShowExplanation] = useState(false)
-  const shuffledOptions = shuffleArray(question.options)
-
-  const handleSubmit = () => {
-    if (selectedAnswer) {
-      const isCorrect = selectedAnswer === question.correct_answer
-      onAnswer(isCorrect)
-      setShowExplanation(true)
-    }
-  }
 
   return (
     <Card className="w-full max-w-2xl">
@@ -38,28 +42,15 @@ export function QuizQuestion({ question, onAnswer }: QuestionProps) {
         <CardTitle>{question.question}</CardTitle>
       </CardHeader>
       <CardContent>
-        <RadioGroup value={selectedAnswer || ''} onValueChange={setSelectedAnswer}>
+        <RadioGroup value={userAnswer || ''} onValueChange={onAnswerSelected}>
           {shuffledOptions.map((option, index) => (
             <div key={index} className="flex items-center space-x-2">
-              <RadioGroupItem value={option} id={`option-${index}`} disabled={showExplanation} />
+              <RadioGroupItem value={option} id={`option-${index}`} />
               <Label htmlFor={`option-${index}`}>{option}</Label>
             </div>
           ))}
         </RadioGroup>
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button onClick={handleSubmit} disabled={!selectedAnswer || showExplanation}>
-          Submit Answer
-        </Button>
-      </CardFooter>
-      {showExplanation && (
-        <CardContent>
-          <p className={`mt-4 p-4 rounded-md ${selectedAnswer === question.correct_answer ? 'bg-green-100' : 'bg-red-100'}`}>
-            {selectedAnswer === question.correct_answer ? 'Correct!' : 'Incorrect.'}
-          </p>
-          <p className="mt-2">{question.explanation}</p>
-        </CardContent>
-      )}
     </Card>
   )
 }
