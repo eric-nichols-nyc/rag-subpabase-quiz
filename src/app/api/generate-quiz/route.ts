@@ -1,0 +1,127 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getAuth } from "@clerk/nextjs/server";
+import { createClerkSupabaseClientSsr } from '@/lib/supabase/server';
+import { OpenAI } from 'openai';
+
+const openai = new OpenAI();
+
+export async function POST(request: NextRequest) {
+  const supabase = await createClerkSupabaseClientSsr();
+  
+  try {
+    // 1. Auth check
+    const { userId } = getAuth(request);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // 2. Get document ID from request
+    const { documentId, numQuestions = 5, difficulty = 'medium' } = await request.json();
+    if (!documentId) {
+      return NextResponse.json({ error: "Document ID is required" }, { status: 400 });
+    }
+
+    // Query the document and get the title
+    const { data: documentTitle, error: docTitleError } = await supabase
+      .from('documents')
+      .select('title')
+      .eq('id', documentId)
+      .single();
+
+      console.log('Document title:', {documentTitle, docTitleError});
+    
+      // 3. Query document chunks with better error handling
+      const { data: chunks, error: docError } = await supabase
+      .from('document_chunks')
+      .select('*')
+      .eq('document_id', documentId);
+
+    console.log('Query results:', { chunks, docError }); // Log both results and errors
+
+    if (docError) {
+        console.error('Database error:', docError);
+        return NextResponse.json({ error: "Database query failed" }, { status: 500 });
+      }
+  
+      if (!chunks || chunks.length === 0) {
+        console.log('No chunks found for documentId:', documentId);
+        return NextResponse.json({ error: "No document chunks found" }, { status: 404 });
+      }
+
+      // Combine chunks for processing
+    const fullContent = chunks.map(chunk => chunk.content).join(' ');
+    console.log('Content length:', fullContent.length); // Verify we have content
+
+    // 4. Generate quiz using OpenAI
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4-turbo-preview",
+      messages: [
+        {
+            role: "system",
+            content: `You are a quiz generator. Create ${numQuestions} multiple-choice questions at ${difficulty} difficulty level.
+            Each question should test understanding of key concepts and details from the provided text.
+            Format each question as valid JSON object with:
+            - question (string)
+            - correctAnswer (string)
+            - incorrectAnswers (array of 3 strings)
+            - explanation (string)
+            Return the questions as a JSON array.`
+          },
+        {
+          role: "user",
+          content: fullContent
+        }
+      ],
+      response_format: { type: "json_object" }
+    });
+
+    const content = completion.choices[0].message.content;
+    if (!content) throw new Error("No content received from OpenAI");
+    const quiz = JSON.parse(content);
+
+    console.log('Quiz:', quiz);
+
+    // 5. Store quiz in database
+    const { data: quizData, error: quizError } = await supabase
+      .from('quizzes')
+      .insert({
+        user_id: userId,
+        title: 'Quiz',
+        description: `${numQuestions} ${difficulty} questions`,
+      })
+      .select()
+      .single();
+
+    if (quizError) {
+      throw quizError;
+    }
+
+    // add questions to db
+      await supabase
+        .from('questions')
+        .insert({
+          quiz_id: quizData.id,
+          question: quiz.question,
+          options: quiz.incorrectAnswers.concat(quiz.correctAnswer),
+          correct_answer: quiz.correctAnswer,
+          explanation: quiz.explanation
+        })
+    
+
+
+    return NextResponse.json({
+      success: true,
+      quiz: quizData
+    });
+
+  } catch (error) {
+    console.error('Error generating quiz:', error);
+    return NextResponse.json(
+      { 
+        error: error instanceof Error ? error.message : 'Failed to generate quiz',
+        details: process.env.NODE_ENV === 'development' ? error : undefined
+      }, 
+      { status: 500 }
+    );
+  }
+} 

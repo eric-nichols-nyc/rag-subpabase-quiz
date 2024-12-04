@@ -9,21 +9,26 @@ import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UrlUploadForm } from "@/components/url-upload-form";
 import { toast } from "sonner";
-import { z } from "zod"
+import { z } from "zod";
 
-const uploadSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  content: z.string().optional(),
-  file: z.any().optional(),
-  url: z.string().url().optional(),
-}).refine(data => {
-  const hasContent = data.content && data.content.trim().length > 0;
-  const hasFile = data.file !== null;
-  const hasUrl = data.url && data.url.trim().length > 0;
-  return hasContent || hasFile || hasUrl;
-}, {
-  message: "Either content, file, or URL must be provided"
-});
+const uploadSchema = z
+  .object({
+    title: z.string().min(1, "Title is required"),
+    content: z.string().optional(),
+    file: z.any().optional(),
+    url: z.string().url().optional(),
+  })
+  .refine(
+    (data) => {
+      const hasContent = data.content && data.content.trim().length > 0;
+      const hasFile = data.file !== null;
+      const hasUrl = data.url && data.url.trim().length > 0;
+      return hasContent || hasFile || hasUrl;
+    },
+    {
+      message: "Either content, file, or URL must be provided",
+    }
+  );
 
 export default function UploadPage() {
   const [title, setTitle] = useState("");
@@ -33,49 +38,52 @@ export default function UploadPage() {
   const [isUploading, setIsUploading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const formData = new FormData()
-    
+    e.preventDefault();
+    const formData = new FormData();
+
     // validate the form data
-    const validatedData = uploadSchema.safeParse({ title, content, file, url })
+    const validatedData = uploadSchema.safeParse({ title, content, file, url });
     if (!validatedData.success) {
-      console.log('validatedData.error = ', validatedData.error)
-      toast.error(validatedData.error.errors[0].message)
-      return
+      console.log("validatedData.error = ", validatedData.error);
+      toast.error(validatedData.error.errors[0].message);
+      return;
     }
 
-    formData.append('title', validatedData.data.title)
-    if (validatedData.data.content) formData.append('content', validatedData.data.content)
-    if (validatedData.data.file) formData.append('file', validatedData.data.file)
-    if (validatedData.data.url) formData.append('url', validatedData.data.url)
-    
+    formData.append("title", validatedData.data.title);
+    if (validatedData.data.content)
+      formData.append("content", validatedData.data.content);
+    if (validatedData.data.file)
+      formData.append("file", validatedData.data.file);
+    if (validatedData.data.url) formData.append("url", validatedData.data.url);
+
     try {
-      setIsUploading(true)
-      const response = await fetch('/api/upload', {
-        method: 'POST',
+      setIsUploading(true);
+      const response = await fetch("/api/upload", {
+        method: "POST",
         body: formData,
-      })
-      
+      });
+
       if (!response.ok) {
-        const error = await response.text()
-        throw new Error(error || 'Upload failed')
+        const error = await response.text();
+        throw new Error(error || "Upload failed");
       }
-      
-      toast.success("Document uploaded and processed")
+
+      toast.success("Document uploaded and processed");
       // Reset form
-      setTitle("")
-      setContent("")
-      setFile(null)
-      setUrl("")
+      setTitle("");
+      setContent("");
+      setFile(null);
+      setUrl("");
     } catch (error: unknown) {
-      console.error(error)
-      toast.error("Upload failed", { 
-        description: error instanceof Error ? error.message : "Please try again later."
-      })
+      console.error(error);
+      toast.error("Upload failed", {
+        description:
+          error instanceof Error ? error.message : "Please try again later.",
+      });
     } finally {
-      setIsUploading(false)
+      setIsUploading(false);
     }
-  }
+  };
 
   const handleUrlSubmit = async (url: string) => {
     try {
@@ -92,13 +100,13 @@ export default function UploadPage() {
       if (!response.ok) {
         throw new Error(data.error || "Processing failed");
       }
-
+      setTitle("")
       toast.success(
         url.includes("youtube.com") || url.includes("youtu.be")
           ? "YouTube transcript processed and stored"
           : "URL content processed and stored"
       );
-      
+
       return true; // Return true on success
     } catch (error: unknown) {
       console.error(error);
@@ -134,7 +142,7 @@ export default function UploadPage() {
               <TabsTrigger value="pdf">PDF Upload</TabsTrigger>
               <TabsTrigger value="url">URL</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="text">
               <div className="space-y-4">
                 <Label htmlFor="content">Content</Label>
@@ -145,6 +153,9 @@ export default function UploadPage() {
                   rows={5}
                   placeholder="Enter your text content here..."
                 />
+                <Button type="submit" disabled={isUploading} className="mt-6">
+                  {isUploading ? "Processing..." : "Process"}
+                </Button>
               </div>
             </TabsContent>
 
@@ -157,6 +168,9 @@ export default function UploadPage() {
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   accept=".pdf"
                 />
+                <Button type="submit" disabled={isUploading} className="mt-6">
+                  {isUploading ? "Uploading..." : "Upload"}
+                </Button>
               </div>
             </TabsContent>
 
@@ -167,10 +181,6 @@ export default function UploadPage() {
               </div>
             </TabsContent>
           </Tabs>
-
-          <Button type="submit" disabled={isUploading} className="mt-6">
-            {isUploading ? "Uploading..." : "Upload"}
-          </Button>
         </form>
       </main>
     </div>
