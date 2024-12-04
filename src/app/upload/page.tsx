@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UrlUploadForm } from "@/components/url-upload-form";
 import { toast } from "sonner";
 import { z } from "zod"
 
@@ -76,6 +77,41 @@ export default function UploadPage() {
     }
   }
 
+  const handleUrlSubmit = async (url: string) => {
+    try {
+      const response = await fetch("/api/scrape", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Processing failed");
+      }
+
+      toast.success(
+        url.includes("youtube.com") || url.includes("youtu.be")
+          ? "YouTube transcript processed and stored"
+          : "URL content processed and stored"
+      );
+      
+      return true; // Return true on success
+    } catch (error: unknown) {
+      console.error(error);
+      toast.error("Processing failed", {
+        description:
+          error instanceof Error
+            ? error.message
+            : "Please try again later. If the problem persists, try a different URL.",
+      });
+      return false; // Return false on failure
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -127,13 +163,7 @@ export default function UploadPage() {
             <TabsContent value="url">
               <div className="space-y-4">
                 <Label htmlFor="url">Website URL</Label>
-                <Input
-                  id="url"
-                  type="url"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://example.com"
-                />
+                <UrlUploadForm onSubmit={handleUrlSubmit} />
               </div>
             </TabsContent>
           </Tabs>
