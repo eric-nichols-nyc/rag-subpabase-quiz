@@ -13,6 +13,8 @@ import { QuizData } from "../types/quiz";
 import dayjs from "dayjs";
 import { DeleteQuizButton } from "@/components/delete-quiz-button";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 // This is a mock function to simulate fetching quizzes from a database
 async function getQuizzes() {
@@ -21,6 +23,10 @@ async function getQuizzes() {
 }
 
 export default async function Dashboard() {
+  const { userId } = auth();
+  if (userId) {
+    redirect('/dashboard');
+  }
   const quizzes = await getQuizzes()
 
   return (

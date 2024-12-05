@@ -1,3 +1,5 @@
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { getQuizzesForUser } from "@/actions/actions";
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
@@ -9,18 +11,24 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { QuizData } from "@/types/quiz";
+import { QuizData } from "../../types/quiz";
 import dayjs from "dayjs";
 import { DeleteQuizButton } from "@/components/delete-quiz-button";
 import Link from "next/link";
 
-// This is a mock function to simulate fetching quizzes from a database
 async function getQuizzes() {
   const quizzes = await getQuizzesForUser() as QuizData[];
   return quizzes;
 }
 
 export default async function Dashboard() {
+  const { userId } = auth();
+  
+  // Redirect to sign-in if user is not authenticated
+//   if (userId) {
+//     redirect('/sign-in');
+//   }
+
   const quizzes = await getQuizzes()
 
   return (
