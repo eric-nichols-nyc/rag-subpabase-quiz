@@ -9,9 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Trash2 } from 'lucide-react'
 import { QuizData } from "../../types/quiz";
 import dayjs from "dayjs";
+import { DeleteQuizButton } from "@/components/delete-quiz-button";
+
 // This is a mock function to simulate fetching quizzes from a database
 async function getQuizzes() {
   const quizzes = await getQuizzesForUser() as QuizData[];
@@ -45,9 +46,7 @@ export default async function Dashboard() {
                     <Button variant="outline">
                       Take Quiz
                     </Button>
-                    <Button size="icon" variant="outline" className="ml-2">
-                      <Trash2 className="h-4 w-4" color="red"/>
-                    </Button>
+                    <DeleteQuizButton quizId={quiz.id} />
                 </TableCell>
               </TableRow>
             ))}

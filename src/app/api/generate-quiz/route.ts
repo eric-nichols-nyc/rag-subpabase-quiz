@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from "@clerk/nextjs/server";
 import { createClerkSupabaseClientSsr } from '@/lib/supabase/server';
 import { OpenAI } from 'openai';
+import { revalidatePath } from "next/cache";
 
 const openai = new OpenAI();
 
@@ -104,12 +105,29 @@ export async function POST(request: NextRequest) {
 
         console.log('Quiz:', quiz);
 
-        // 5. Store quiz in database
+        // 5. Store quiz in database with unique name handling
+        const generateUniqueName = (baseName: string) => {
+            const randomString = Math.random().toString(36).substring(2, 5);
+            return `${baseName}-${randomString}`;
+        };
+
+        let finalTitle = title;
+        const { data: existingQuiz } = await supabase
+            .from('quizzes')
+            .select('id')
+            .eq('title', title)
+            .eq('user_id', userId)
+            .single();
+
+        if (existingQuiz) {
+            finalTitle = generateUniqueName(title);
+        }
+
         const { data: quizData, error: quizError } = await supabase
             .from('quizzes')
             .insert({
                 user_id: userId,
-                title: title,
+                title: finalTitle,
                 description: `${numQuestions} ${difficulty} questions`,
             })
             .select()
@@ -136,6 +154,9 @@ export async function POST(request: NextRequest) {
         if (questionsError) {
             throw questionsError;
         }
+
+        // Add revalidation after successful quiz creation
+        revalidatePath('/quizzes');
 
         return NextResponse.json({
             success: true,
