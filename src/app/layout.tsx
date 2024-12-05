@@ -3,7 +3,7 @@ import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
 
 import "./globals.css";
-import { ClerkProvider, UserButton, SignedIn, SignInButton, SignedOut } from "@clerk/nextjs";
+import { ClerkProvider, SignInButton, SignedOut } from "@clerk/nextjs";
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -23,9 +23,6 @@ export default function RootLayout({
           <SignedOut>
             <SignInButton />
           </SignedOut>
-          <SignedIn>
-            <UserButton />
-          </SignedIn>
           {children}
           <Toaster />
 

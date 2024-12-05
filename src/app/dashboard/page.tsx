@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { QuizData } from "../types/quiz";
+import { QuizData } from "@/types/quiz";
 import dayjs from "dayjs";
 import { DeleteQuizButton } from "@/components/delete-quiz-button";
 import Link from "next/link";

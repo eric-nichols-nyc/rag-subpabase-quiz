@@ -1,32 +1,54 @@
+'use client'
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { siteConfig } from "@/config/site-config"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { LogOut } from "lucide-react"
+import { useClerk } from '@clerk/nextjs'
 
 export function Header() {
+  const { signOut } = useClerk()
+
   return (
-    <header className="flex items-center justify-between p-6 bg-background border-b">
+    <header className="sticky top-0 z-50 flex items-center justify-between p-6 bg-background border-b">
       <Link href="/" className="text-2xl font-bold">
-        AI Quiz Generator
+        {siteConfig.name}
       </Link>
       <nav>
         <ul className="flex space-x-4">
-          <li>
-            <Button asChild variant="ghost">
-              <Link href="/">Dashboard</Link>
-            </Button>
-          </li>
-          <li>
-            <Button asChild variant="ghost">
-              <Link href="/upload">Upload</Link>
-            </Button>
-          </li>
-          <li>
-            <Button asChild variant="ghost">
-              <Link href="/generate">Generate Quiz</Link>
-            </Button>
-          </li>
+          {siteConfig.navigation.map((item) => (
+            <li key={item.href}>
+              <Button asChild variant="ghost">
+                <Link href={item.href}>{item.title}</Link>
+              </Button>
+            </li>
+          ))}
         </ul>
       </nav>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Avatar className="cursor-pointer">
+            <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+            <AvatarFallback>CN</AvatarFallback>
+          </Avatar>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem 
+            className="cursor-pointer"
+            onClick={() => signOut({ redirectUrl: '/' })}
+          >
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Sign Out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   )
 }
-

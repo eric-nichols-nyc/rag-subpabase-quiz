@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react'
 import {Quiz} from './Quiz'
-import { QuizProps } from '../../types/quiz'
+import { QuizProps } from '../types/quiz'
 
 const QuizGallery = ({id}: {id: string}) => {
     const [quizData, setQuizData] = useState<QuizProps | null>(null)

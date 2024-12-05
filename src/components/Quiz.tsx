@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { QuizQuestion } from './Question'
 import { Results } from './Results'
-import { QuizProps } from '../../types/quiz'
+import { QuizProps } from '../types/quiz'
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 
