@@ -24,14 +24,21 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
   const [subject, setSubject] = useState("")
   const [quizId, setQuizId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [title, setTitle] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
-    // validate selectedDocument
+    // validate selectedDocument and title
     if (!selectedDocument) {
       toast.error("Please select a document")
+      setIsLoading(false)
+      return
+    }
+
+    if (!title.trim()) {
+      toast.error("Please enter a quiz title")
       setIsLoading(false)
       return
     }
@@ -42,7 +49,11 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ documentId: selectedDocument, subject }),
+        body: JSON.stringify({ 
+          documentId: selectedDocument, 
+          subject,
+          title: title.trim() 
+        }),
       })
 
       if (!response.ok) throw new Error("Failed to generate quiz")
@@ -64,12 +75,22 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
     }
   }
 
+  // Add handler to update title when document is selected
+  const handleDocumentSelect = (documentId: string) => {
+    setSelectedDocument(documentId)
+    // Find the selected document and set its title as the quiz title
+    const selectedDoc = documents.find(doc => doc.id === documentId)
+    if (selectedDoc) {
+      setTitle(selectedDoc.title)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <Label htmlFor="document">Select a document</Label>
-          <Select onValueChange={setSelectedDocument}>
+          <Select onValueChange={handleDocumentSelect}>
             <SelectTrigger>
               <SelectValue placeholder="Select a document" />
             </SelectTrigger>
@@ -81,6 +102,16 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
               ))}
             </SelectContent>
           </Select>
+        </div>
+        <div>
+          <Label htmlFor="title">Quiz Title</Label>
+          <Input
+            id="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter quiz title"
+            required
+          />
         </div>
         <div>
           <Label htmlFor="subject">Or enter a subject</Label>

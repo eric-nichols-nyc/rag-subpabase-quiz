@@ -1,3 +1,4 @@
+import { getQuizzesForUser } from "@/actions/actions";
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import {
@@ -8,15 +9,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Archive, Trash2 } from 'lucide-react'
-
+import { Trash2 } from 'lucide-react'
+import { QuizData } from "../../types/quiz";
+import dayjs from "dayjs";
 // This is a mock function to simulate fetching quizzes from a database
 async function getQuizzes() {
-  return [
-    { id: 1, title: "Redux Basics", createdAt: "2023-04-01", status: "Active" },
-    { id: 2, title: "React Hooks", createdAt: "2023-04-02", status: "Archived" },
-    { id: 3, title: "NextJS 13 Features", createdAt: "2023-04-03", status: "Active" },
-  ]
+  const quizzes = await getQuizzesForUser() as QuizData[];
+  return quizzes;
 }
 
 export default async function Dashboard() {
@@ -40,17 +39,15 @@ export default async function Dashboard() {
             {quizzes.map((quiz) => (
               <TableRow key={quiz.id}>
                 <TableCell>{quiz.title}</TableCell>
-                <TableCell>{quiz.createdAt}</TableCell>
+                <TableCell>{dayjs(quiz.created_at).format('MM/DD/YYYY')}</TableCell>
                 <TableCell>{quiz.status}</TableCell>
                 <TableCell>
-                  <div className="flex space-x-2">
-                    <Button size="icon" variant="outline">
-                      <Archive className="h-4 w-4" />
+                    <Button variant="outline">
+                      Take Quiz
                     </Button>
-                    <Button size="icon" variant="outline">
-                      <Trash2 className="h-4 w-4" />
+                    <Button size="icon" variant="outline" className="ml-2">
+                      <Trash2 className="h-4 w-4" color="red"/>
                     </Button>
-                  </div>
                 </TableCell>
               </TableRow>
             ))}

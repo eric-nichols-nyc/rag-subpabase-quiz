@@ -29,7 +29,6 @@ const QuizGallery = ({id}: {id: string}) => {
                 }
             
                 const result = await response.json()
-                console.log(result)
                 setQuizData(result)
             } catch (error) {
                 console.error("Error in getQuiz:", error)

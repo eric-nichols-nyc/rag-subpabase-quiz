@@ -23,9 +23,13 @@ export async function POST(request: NextRequest) {
         }
 
         // 2. Get document ID from request
-        const { documentId, numQuestions = 5, difficulty = 'medium' } = await request.json();
+        const { documentId, numQuestions = 5, difficulty = 'medium', title } = await request.json();
         if (!documentId) {
             return NextResponse.json({ error: "Document ID is required" }, { status: 400 });
+        }
+
+        if (!title) {
+            return NextResponse.json({ error: "Quiz title is required" }, { status: 400 });
         }
 
         // Query the document and get the title
@@ -43,7 +47,6 @@ export async function POST(request: NextRequest) {
             .select('*')
             .eq('document_id', documentId);
 
-        console.log('Query results:', { chunks, docError }); // Log both results and errors
 
         if (docError) {
             console.error('Database error:', docError);
@@ -54,6 +57,7 @@ export async function POST(request: NextRequest) {
             console.log('No chunks found for documentId:', documentId);
             return NextResponse.json({ error: "No document chunks found" }, { status: 404 });
         }
+        console.log('Query results:', chunks.length); // Log both results and errors
 
         // Combine chunks for processing
         const fullContent = chunks.map(chunk => chunk.content).join(' ');
@@ -105,7 +109,7 @@ export async function POST(request: NextRequest) {
             .from('quizzes')
             .insert({
                 user_id: userId,
-                title: 'Quiz',
+                title: title,
                 description: `${numQuestions} ${difficulty} questions`,
             })
             .select()

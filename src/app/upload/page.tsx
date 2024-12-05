@@ -34,7 +34,7 @@ export default function UploadPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState<string>("");
   const [file, setFile] = useState<File | null>(null);
-  const [url, setUrl] = useState<string>("");
+  //const [url, setUrl] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -42,7 +42,7 @@ export default function UploadPage() {
     const formData = new FormData();
 
     // validate the form data
-    const validatedData = uploadSchema.safeParse({ title, content, file, url });
+    const validatedData = uploadSchema.safeParse({ title, content, file });
     if (!validatedData.success) {
       console.log("validatedData.error = ", validatedData.error);
       toast.error(validatedData.error.errors[0].message);
@@ -73,7 +73,7 @@ export default function UploadPage() {
       setTitle("");
       setContent("");
       setFile(null);
-      setUrl("");
+      //setUrl("");
     } catch (error: unknown) {
       console.error(error);
       toast.error("Upload failed", {
