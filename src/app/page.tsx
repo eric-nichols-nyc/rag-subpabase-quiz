@@ -12,6 +12,7 @@ import {
 import { QuizData } from "../../types/quiz";
 import dayjs from "dayjs";
 import { DeleteQuizButton } from "@/components/delete-quiz-button";
+import Link from "next/link";
 
 // This is a mock function to simulate fetching quizzes from a database
 async function getQuizzes() {
@@ -43,9 +44,11 @@ export default async function Dashboard() {
                 <TableCell>{dayjs(quiz.created_at).format('MM/DD/YYYY')}</TableCell>
                 <TableCell>{quiz.status}</TableCell>
                 <TableCell>
-                    <Button variant="outline">
-                      Take Quiz
-                    </Button>
+                    <Link href={`/quiz/${quiz.id}`}>
+                      <Button variant="outline">
+                        Take Quiz
+                      </Button>
+                    </Link>
                     <DeleteQuizButton quizId={quiz.id} />
                 </TableCell>
               </TableRow>
