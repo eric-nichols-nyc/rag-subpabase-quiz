@@ -12,9 +12,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { LogOut } from "lucide-react"
 import { useClerk } from '@clerk/nextjs'
+import { usePathname } from "next/navigation"
 
 export function Header() {
   const { signOut } = useClerk()
+  const pathname = usePathname()
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between p-6 bg-background border-b">
@@ -25,7 +27,10 @@ export function Header() {
         <ul className="flex space-x-4">
           {siteConfig.navigation.map((item) => (
             <li key={item.href}>
-              <Button asChild variant="ghost">
+              <Button 
+                asChild 
+                variant={pathname === item.href ? "default" : "ghost"}
+              >
                 <Link href={item.href}>{item.title}</Link>
               </Button>
             </li>

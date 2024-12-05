@@ -1,5 +1,5 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
+//import { auth } from "@clerk/nextjs/server";
+//import { redirect } from "next/navigation";
 import { getQuizzesForUser } from "@/actions/actions";
 import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
@@ -22,7 +22,7 @@ async function getQuizzes() {
 }
 
 export default async function Dashboard() {
-  const { userId } = auth();
+  //const { userId } = auth();
   
   // Redirect to sign-in if user is not authenticated
 //   if (userId) {

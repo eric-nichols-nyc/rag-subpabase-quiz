@@ -1,10 +1,10 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import {Quiz} from './Quiz'
-import { QuizProps } from '../types/quiz'
+import {Quiz} from './quiz'
+import { QuizData } from '../types/quiz'
 
 const QuizGallery = ({id}: {id: string}) => {
-    const [quizData, setQuizData] = useState<QuizProps | null>(null)
+    const [quizData, setQuizData] = useState<QuizData | null>(null)
     const [isLoading, setIsLoading] = useState(true)
     
     useEffect(() => {
@@ -29,6 +29,7 @@ const QuizGallery = ({id}: {id: string}) => {
                 }
             
                 const result = await response.json()
+                console.log("Quiz data:", result)
                 setQuizData(result)
             } catch (error) {
                 console.error("Error in getQuiz:", error)
@@ -46,7 +47,9 @@ const QuizGallery = ({id}: {id: string}) => {
     }
 
     return (
-        <div><Quiz quizData={quizData} /></div>
+        quizData && (
+            <div><Quiz quizData={quizData} /></div>
+        )
     )
 }
 

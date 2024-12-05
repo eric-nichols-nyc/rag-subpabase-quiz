@@ -6,6 +6,8 @@ interface ResultsProps {
   score: number;
   totalQuestions: number;
   onRestart: () => void;
+  questions: Question[];
+  userAnswers: (string | null)[];
 }
 
 export function Results({ 
@@ -14,13 +16,7 @@ export function Results({
   onRestart, 
   questions, 
   userAnswers 
-}: { 
-  score: number;
-  totalQuestions: number;
-  onRestart: () => void;
-  questions: Question[];
-  userAnswers: (string | null)[];
-}) {
+}: ResultsProps) {
   const percentage = Math.round((score / totalQuestions) * 100)
 
   return (
@@ -38,7 +34,7 @@ export function Results({
             <div 
               key={index} 
               className={`p-4 rounded-lg border ${
-                userAnswers[index] === question.correct_answer 
+                userAnswers[index] === question.correctAnswer 
                   ? 'bg-green-50 border-green-200'
                   : 'bg-red-50 border-red-200'
               }`}
@@ -49,10 +45,10 @@ export function Results({
                   <span className="font-medium">Your answer: </span>
                   {userAnswers[index]}
                 </p>
-                {userAnswers[index] !== question.correct_answer && (
+                {userAnswers[index] !== question.correctAnswer && (
                   <p className="text-green-700">
                     <span className="font-medium">Correct answer: </span>
-                    {question.correct_answer}
+                    {question.correctAnswer}
                   </p>
                 )}
                 <p className="text-gray-600 mt-2">

@@ -3,22 +3,21 @@ export interface QuizData {
   title: string;
   description: string;
   status: string;
-  difficulty: string;
-  user_id: string;
-  created_at: string;
-  updated_at: string;
   questions: Question[];
+  created_at: Date;
+  updated_at: Date;
+  userId: string;
 }
 
 export interface Question {
   id: string;
   question: string;
   options: string[];
-  correct_answer: string;
-  explanation: string;
-  quiz_id: string;
-  created_at: string;
-  updated_at: string;
+  correctAnswer: string; // Ensure this is included
+  explanation: string | null;
+  quizId: string; // Ensure this is included
+  createdAt: Date; // Ensure this is included
+  updatedAt: Date; // Ensure this is included
 }
 
 export interface QuizProps {

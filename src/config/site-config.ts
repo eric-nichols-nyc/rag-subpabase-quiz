@@ -8,7 +8,7 @@ export const siteConfig = {
   navigation: [
     {
       title: "Dashboard",
-      href: "/",
+      href: "/dashboard",
     },
     {
       title: "Upload",

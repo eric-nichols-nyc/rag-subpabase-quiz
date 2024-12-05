@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from 'react'
-import { QuizQuestion } from './Question'
-import { Results } from './Results'
+import { QuizQuestion } from './question'
+import { Results } from './results'
 import { QuizProps } from '../types/quiz'
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
@@ -36,7 +36,7 @@ export function Quiz({ quizData }: QuizProps) {
 
   const calculateScore = () => {
     return userAnswers.reduce((score, answer, index) => {
-      return score + (answer === quizData.questions[index].correct_answer ? 1 : 0)
+      return score + (answer === quizData.questions[index].correctAnswer ? 1 : 0)
     }, 0)
   }
 
