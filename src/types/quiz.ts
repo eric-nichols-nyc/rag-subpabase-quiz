@@ -13,11 +13,11 @@ export interface Question {
   id: string;
   question: string;
   options: string[];
-  correctAnswer: string; // Ensure this is included
+  correct_answer: string;
   explanation: string | null;
-  quizId: string; // Ensure this is included
-  createdAt: Date; // Ensure this is included
-  updatedAt: Date; // Ensure this is included
+  quiz_id: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface QuizProps {

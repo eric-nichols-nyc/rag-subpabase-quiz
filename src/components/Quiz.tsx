@@ -36,7 +36,7 @@ export function Quiz({ quizData }: QuizProps) {
 
   const calculateScore = () => {
     return userAnswers.reduce((score, answer, index) => {
-      return score + (answer === quizData.questions[index].correctAnswer ? 1 : 0)
+      return score + (answer === quizData.questions[index].correct_answer ? 1 : 0)
     }, 0)
   }
 
@@ -47,6 +47,15 @@ export function Quiz({ quizData }: QuizProps) {
   }
 
   const progress = ((currentQuestionIndex + 1) / quizData.questions.length) * 100
+
+  if (!quizData.questions || quizData.questions.length === 0) {
+    return (
+      <div className="text-center p-8">
+        <h2 className="text-xl font-semibold">No questions available</h2>
+        <p className="text-muted-foreground mt-2">This quiz doesn't have any questions yet.</p>
+      </div>
+    )
+  }
 
   if (showResults) {
     return    <Results 

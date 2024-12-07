@@ -1,17 +1,20 @@
 "use client"
 import React, { useEffect, useState } from 'react'
-import {Quiz} from './quiz'
+import { Quiz } from './quiz'
 import { QuizData } from '../types/quiz'
+import { Loader2 } from "lucide-react"
 
 const QuizGallery = ({id}: {id: string}) => {
     const [quizData, setQuizData] = useState<QuizData | null>(null)
     const [isLoading, setIsLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
     
     useEffect(() => {
         const getQuiz = async () => {
             try {
                 setIsLoading(true)
-                console.log("Starting getQuiz with id:", id)
+                setError(null)
+                
                 const response = await fetch(`/api/quiz/${id}`, {
                     method: 'GET',
                     headers: {
@@ -21,7 +24,8 @@ const QuizGallery = ({id}: {id: string}) => {
                 })
                 
                 if (response.status === 404) {
-                    console.log("Quiz not found")
+                    setError("Quiz not found")
+                    return
                 }
             
                 if (!response.ok) {
@@ -29,11 +33,10 @@ const QuizGallery = ({id}: {id: string}) => {
                 }
             
                 const result = await response.json()
-                console.log("Quiz data:", result)
                 setQuizData(result)
             } catch (error) {
                 console.error("Error in getQuiz:", error)
-                throw error
+                setError("Failed to load quiz. Please try again later.")
             } finally {
                 setIsLoading(false)
             }
@@ -43,14 +46,27 @@ const QuizGallery = ({id}: {id: string}) => {
     }, [id])
 
     if (isLoading) {
-        return <div className="flex justify-center items-center min-h-[200px]">Loading quiz...</div>
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+                <Loader2 className="h-8 w-8 animate-spin" />
+                <p className="text-muted-foreground">Loading quiz...</p>
+            </div>
+        )
     }
 
-    return (
-        quizData && (
-            <div><Quiz quizData={quizData} /></div>
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+                <p className="text-red-500">{error}</p>
+            </div>
         )
-    )
+    }
+
+    return quizData ? (
+        <div className="container mx-auto px-4 py-8">
+            <Quiz quizData={quizData} />
+        </div>
+    ) : null
 }
 
 export default QuizGallery
