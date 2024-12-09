@@ -26,6 +26,8 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
   const [quizId, setQuizId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [title, setTitle] = useState("")
+  const [numQuestions, setNumQuestions] = useState(5)
+  const [difficulty, setDifficulty] = useState("MEDIUM")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -172,14 +174,32 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
                   required
                 />
               </div>
-              {/* add select for number of questions */}
-              <div>
-                <Label htmlFor="numQuestions">Number of Questions</Label>
-                <Select>
+              {/* add number input for number of questions */}
+              <div className="flex gap-2">
+                <div className="flex flex-col flex-1">
+                  <Label htmlFor="numQuestions">Number of Questions</Label>
+                  <Input
+                    id="numQuestions"
+                  type="number"
+                  value={numQuestions}
+                  onChange={(e) => setNumQuestions(parseInt(e.target.value))}
+                  placeholder="Enter number of questions"
+                  required
+                />
+                </div>
+                <div className="flex flex-col flex-1">
+                <Label htmlFor="difficulty">Difficulty</Label>
+                <Select value={difficulty} onValueChange={setDifficulty}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select number of questions" />
+                    <SelectValue placeholder="Select difficulty" />
                   </SelectTrigger>
-                </Select>
+                  <SelectContent>
+                    <SelectItem value="EASY">Easy</SelectItem>
+                    <SelectItem value="MEDIUM">Medium</SelectItem>
+                    <SelectItem value="HARD">Hard</SelectItem>
+                  </SelectContent>
+                  </Select>
+                </div>
               </div>
               <Button 
                 type="submit" 
