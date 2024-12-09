@@ -112,7 +112,7 @@ enum Difficulty {
 model Question {
   id            String      @id @default(cuid())
   question      String
-  options       String[]    // Multiple choice options
+  incorrectAnswers       String[]    // Multiple choice options
   correctAnswer String
   explanation   String?
   

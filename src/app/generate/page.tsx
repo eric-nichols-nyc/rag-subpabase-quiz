@@ -4,7 +4,6 @@ import { GenerateQuizForm } from "@/components/generate-quiz-form"
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/server"
 import { auth } from "@clerk/nextjs/server"
 
-
 const getDocuments = async () => {
   const {userId} = auth()
   const supabase = await createClerkSupabaseClientSsr()
@@ -28,8 +27,16 @@ export default async function GenerateQuizPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto mt-8 p-4">
-        <h1 className="text-3xl font-bold mb-6">Generate Quiz</h1>
-        <GenerateQuizForm documents={documents} />
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-3xl font-bold mb-3">Generate Quiz</h1>
+          <p className="text-muted-foreground mb-6">
+            Create a custom quiz by either selecting one of your uploaded documents 
+            or choosing from our predefined topics in React development. Your document-based 
+            quiz will be tailored to your content, while topic-based quizzes draw from 
+            our curated knowledge base.
+          </p>
+          <GenerateQuizForm documents={documents} />
+        </div>
       </main>
     </div>
   )

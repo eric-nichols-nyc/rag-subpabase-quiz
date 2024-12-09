@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
         const questionInserts = quiz.questions.map((q: Question) => ({
             quiz_id: quizData.id,
             question: q.question,
-            options: [...q.incorrectAnswers, q.correctAnswer],
+            incorrect_answers: q.incorrectAnswers,
             correct_answer: q.correctAnswer,
             explanation: q.explanation
         }));

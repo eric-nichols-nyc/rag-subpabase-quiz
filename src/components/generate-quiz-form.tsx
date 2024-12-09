@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { toast } from "sonner"
 import { Document } from "@prisma/client"
 
@@ -21,7 +22,7 @@ interface GenerateQuizFormProps {
 
 export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
   const [selectedDocument, setSelectedDocument] = useState("")
-  const [subject, setSubject] = useState("")
+  const [selectedTopic, setSelectedTopic] = useState("")
   const [quizId, setQuizId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [title, setTitle] = useState("")
@@ -51,7 +52,7 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
         },
         body: JSON.stringify({ 
           documentId: selectedDocument, 
-          subject,
+          subject: "",
           title: title.trim() 
         }),
       })
@@ -85,51 +86,130 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
     }
   }
 
+  const handleTopicSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    if (!selectedTopic) {
+      toast.error("Please select a topic")
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      const response = await fetch("/api/topics", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          topic: selectedTopic,
+          title: `${selectedTopic.charAt(0).toUpperCase() + selectedTopic.slice(1)} Quiz`,
+          numQuestions: 5,
+          difficulty: "MEDIUM"
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        if (data.reason) {
+          toast.error(data.reason)
+        } else {
+          toast.error(data.error || "Failed to generate quiz")
+        }
+        return
+      }
+      
+      if (data.quiz?.id) {
+        setQuizId(data.quiz.id)
+        toast.success("Quiz generated successfully")
+      } else {
+        throw new Error("No quiz ID returned")
+      }
+    } catch (error) {
+      console.error("Error generating quiz:", error)
+      toast.error("Failed to generate quiz")
+      setQuizId(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <Label htmlFor="document">Select a document</Label>
-          <Select onValueChange={handleDocumentSelect}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select a document" />
-            </SelectTrigger>
-            <SelectContent>
-              {documents.map((doc) => (
-                <SelectItem key={doc.id} value={doc.id}>
-                  {doc.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor="title">Quiz Title</Label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter quiz title"
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="subject">Or enter a subject</Label>
-          <Input
-            id="subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="e.g., Redux"
-            disabled
-          />
-        </div>
-        <Button 
-          type="submit" 
-          disabled={isLoading || quizId !== null}
-        >
-          {isLoading ? "Generating Quiz..." : "Generate Quiz"}
-        </Button>
-      </form>
+      <Tabs defaultValue="document" className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="document">Document Quiz</TabsTrigger>
+          <TabsTrigger value="topic">Topic Quiz</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="document" className="space-y-4 mt-4">
+          <div className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="document">Select a document</Label>
+                <Select onValueChange={handleDocumentSelect}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a document" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {documents.map((doc) => (
+                      <SelectItem key={doc.id} value={doc.id}>
+                        {doc.title}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="title">Quiz Title</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Enter quiz title"
+                  required
+                />
+              </div>
+              <Button 
+                type="submit" 
+                disabled={isLoading || quizId !== null}
+                className="w-full"
+              >
+                {isLoading ? "Generating Quiz..." : "Generate Document Quiz"}
+              </Button>
+            </form>
+          </div>
+        </TabsContent>
+
+        <TabsContent value="topic" className="space-y-4 mt-4">
+          <div className="space-y-6">
+            <form onSubmit={handleTopicSubmit} className="space-y-4">
+              <div>
+                <Label htmlFor="topic">Select a topic</Label>
+                <Select onValueChange={setSelectedTopic}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a topic" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="react">React</SelectItem>
+                    <SelectItem value="redux">Redux</SelectItem>
+                    <SelectItem value="hooks">React Hooks</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button 
+                type="submit"
+                disabled={isLoading || quizId !== null}
+                className="w-full"
+              >
+                Generate Topic Quiz
+              </Button>
+            </form>
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {quizId && (
         <div className="mt-4">
