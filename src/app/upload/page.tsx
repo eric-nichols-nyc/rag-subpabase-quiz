@@ -103,27 +103,35 @@ export default function UploadPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto mt-8 p-4">
-        <h1 className="text-3xl font-bold mb-6">Upload Document</h1>
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-3xl font-bold mb-3">Upload Document</h1>
+          <p className="text-muted-foreground mb-6">
+            Upload your learning materials in various formats. You can paste text directly, 
+            upload PDF documents, or provide a URL to web content or YouTube videos. 
+            Your uploaded content will be processed and made available for generating 
+            custom quizzes.
+          </p>
 
-        <Tabs defaultValue="text" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="text">Text Content</TabsTrigger>
-            <TabsTrigger value="pdf">PDF Upload</TabsTrigger>
-            <TabsTrigger value="url">URL</TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="text" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="text">Text Content</TabsTrigger>
+              <TabsTrigger value="pdf">PDF Upload</TabsTrigger>
+              <TabsTrigger value="url">URL</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="text">
-            <TextUploadForm onSubmit={handleTextSubmit} />
-          </TabsContent>
+            <TabsContent value="text">
+              <TextUploadForm onSubmit={handleTextSubmit} />
+            </TabsContent>
 
-          <TabsContent value="pdf">
-            <PdfUploadForm onSubmit={handlePdfSubmit} />
-          </TabsContent>
+            <TabsContent value="pdf">
+              <PdfUploadForm onSubmit={handlePdfSubmit} />
+            </TabsContent>
 
-          <TabsContent value="url">
-            <UrlUploadForm onSubmit={handleUrlSubmit} />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="url">
+              <UrlUploadForm onSubmit={handleUrlSubmit} />
+            </TabsContent>
+          </Tabs>
+        </div>
       </main>
     </div>
   );

@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
             quiz_id: quiz.id,
             question: q.question,
             correct_answer: q.correctAnswer,
-            options: [...q.incorrectAnswers, q.correctAnswer],
+            incorrect_answers: q.incorrectAnswers,
             explanation: q.explanation
         }));
 
