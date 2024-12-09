@@ -87,11 +87,12 @@ export async function POST(request: NextRequest) {
                 .limit(10);
 
             console.log('Fallback text search results:', directChunks?.length || 0);
+            console.log('Fallback text search results:', directChunks);
 
             if (directChunks && directChunks.length >= MIN_CHUNKS_REQUIRED) {
                 relatedChunks = directChunks.map(chunk => ({
                     ...chunk,
-                    similarity: 1.0
+                    similarity: 0.7
                 }));
             } else {
                 return NextResponse.json({

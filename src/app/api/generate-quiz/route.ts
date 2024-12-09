@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 2. Get document ID from request
-        const { documentId, numQuestions = 5, difficulty = 'medium', title } = await request.json();
+        const { documentId, numQuestions = 10, difficulty = 'HARD', title } = await request.json();
         if (!documentId) {
             return NextResponse.json({ error: "Document ID is required" }, { status: 400 });
         }
@@ -62,28 +62,19 @@ export async function POST(request: NextRequest) {
 
         // Combine chunks for processing
         const fullContent = chunks.map(chunk => chunk.content).join(' ');
+        const startTime = Date.now();
 
         // 4. Generate quiz using OpenAI
         const completion = await openai.chat.completions.create({
-            model: "gpt-4-turbo-preview",
+            model: "gpt-3.5-turbo",
             messages: [
                 {
                     role: "system",
-                    content: `You are a quiz generator. Create ${numQuestions} multiple-choice questions at ${difficulty} difficulty level.
-            Each question should test understanding of key concepts and details from the provided text. The quesions should not reference any examples from the text.
-            Format the response as a JSON object with a 'questions' array containing objects with:
-            - question (string)
-            - correctAnswer (string)
-            - incorrectAnswers (array of 3 strings)
-            Example format:
-            {
-              "questions": [
-                {
-                  "question": "What is...?",
-                  "correctAnswer": "Correct option",
-                  "incorrectAnswers": ["Wrong1", "Wrong2", "Wrong3"],
-                }
-              ]
+                    content: `Generate ${numQuestions} multiple-choice questions based on the provided text with a difficulty of ${difficulty}. 
+                    Output a JSON object with 'questions' containing:
+                    - question (string)
+                    - correctAnswer (string)
+                    - incorrectAnswers (array of 3 strings)
             }`
                 },
                 {
@@ -91,18 +82,22 @@ export async function POST(request: NextRequest) {
                     content: fullContent
                 }
             ],
-            response_format: { type: "json_object" }
+            response_format: { type: "json_object" },
+            max_tokens: 1000
         });
 
-        const content = completion.choices[0].message.content;
-        if (!content) throw new Error("No content received from OpenAI");
-        const quiz = JSON.parse(content);
+        const questions = completion.choices[0].message.content;
+        if (!questions) throw new Error("No content received from OpenAI");
+        const quiz = JSON.parse(questions);
 
         // Validate the response format
         if (!quiz.questions || !Array.isArray(quiz.questions)) {
             throw new Error("Invalid quiz format received from OpenAI");
         }
-
+        const endTime = Date.now();
+        const duration = endTime - startTime;
+  
+        console.log(`API call duration: ${duration} ms`);
         console.log('Quiz:', quiz);
 
         // 5. Store quiz in database with unique name handling
@@ -141,12 +136,12 @@ export async function POST(request: NextRequest) {
         const questionInserts = quiz.questions.map((q: Question) => ({
             quiz_id: quizData.id,
             question: q.question,
-            incorrect_answers: q.incorrectAnswers,
+            options: q.incorrectAnswers,
             correct_answer: q.correctAnswer,
             explanation: q.explanation
         }));
 
-        const { data: questions, error: questionsError } = await supabase
+        const { data, error: questionsError } = await supabase
             .from('questions')
             .insert(questionInserts)
             .select();
@@ -154,6 +149,8 @@ export async function POST(request: NextRequest) {
         if (questionsError) {
             throw questionsError;
         }
+
+        console.log('Questions:', data.length);
 
         // Add revalidation after successful quiz creation
         revalidatePath('/quizzes');

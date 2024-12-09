@@ -113,6 +113,7 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
       })
 
       const data = await response.json()
+      console.log('Quiz data:', data);
 
       if (!response.ok) {
         if (data.reason) {
