@@ -35,34 +35,39 @@ export default async function Dashboard() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto mt-8 p-4">
-        <h1 className="text-3xl font-bold mb-6">Your Quizzes</h1>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Title</TableHead>
-              <TableHead>Created At</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {quizzes.map((quiz) => (
-              <TableRow key={quiz.id}>
-                <TableCell>{quiz.title}</TableCell>
-                <TableCell>{dayjs(quiz.created_at).format('MM/DD/YYYY')}</TableCell>
-                <TableCell>{quiz.status}</TableCell>
-                <TableCell>
-                    <Link href={`/quiz/${quiz.id}`}>
-                      <Button variant="outline">
-                        Take Quiz
-                      </Button>
-                    </Link>
-                    <DeleteQuizButton quizId={quiz.id} />
-                </TableCell>
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold mb-3">Your Quizzes</h1>
+          <p className="text-muted-foreground mb-6">
+            View and manage all your created quizzes. Take quizzes again or remove ones you no longer need.
+          </p>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Title</TableHead>
+                <TableHead>Created At</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {quizzes.map((quiz) => (
+                <TableRow key={quiz.id}>
+                  <TableCell>{quiz.title}</TableCell>
+                  <TableCell>{dayjs(quiz.created_at).format('MM/DD/YYYY')}</TableCell>
+                  <TableCell>{quiz.status}</TableCell>
+                  <TableCell>
+                      <Link href={`/quiz/${quiz.id}`}>
+                        <Button variant="outline">
+                          Take Quiz
+                        </Button>
+                      </Link>
+                      <DeleteQuizButton quizId={quiz.id} />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </main>
     </div>
   )

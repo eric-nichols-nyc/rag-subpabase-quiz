@@ -103,7 +103,7 @@ export default function UploadPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto mt-8 p-4">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-bold mb-3">Upload Document</h1>
           <p className="text-muted-foreground mb-6">
             Upload your learning materials in various formats. You can paste text directly, 
