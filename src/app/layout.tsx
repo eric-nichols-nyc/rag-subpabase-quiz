@@ -7,7 +7,7 @@ import { ClerkProvider, SignInButton, SignedOut } from "@clerk/nextjs";
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AI Quiz Generator",
+  title: "AI RAG Quiz Generator",
   description: "Generate quizzes based on your saved documents",
 }
 

@@ -45,7 +45,6 @@ export default async function Dashboard() {
               <TableRow>
                 <TableHead>Title</TableHead>
                 <TableHead>Created At</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -54,7 +53,6 @@ export default async function Dashboard() {
                 <TableRow key={quiz.id}>
                   <TableCell>{quiz.title}</TableCell>
                   <TableCell>{dayjs(quiz.created_at).format('MM/DD/YYYY')}</TableCell>
-                  <TableCell>{quiz.status}</TableCell>
                   <TableCell>
                       <Link href={`/quiz/${quiz.id}`}>
                         <Button variant="outline">

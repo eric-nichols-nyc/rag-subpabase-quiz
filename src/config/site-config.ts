@@ -4,7 +4,7 @@ export type NavItem = {
 }
 
 export const siteConfig = {
-  name: "AI Quiz Generator",
+  name: "AI RAG Quiz Generator",
   navigation: [
     {
       title: "Dashboard",

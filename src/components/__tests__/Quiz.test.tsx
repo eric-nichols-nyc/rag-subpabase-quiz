@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { Quiz } from '../Quiz'
+import { Quiz } from '../quiz'
 import { QuizData } from '../../types/quiz'
 
 const mockQuizData: QuizData = {

@@ -112,11 +112,11 @@ export default function UploadPage() {
             custom quizzes.
           </p>
 
-          <Tabs defaultValue="text" className="w-full">
+          <Tabs defaultValue="url" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="url">URL</TabsTrigger>
               <TabsTrigger value="text">Text Content</TabsTrigger>
               <TabsTrigger value="pdf">PDF Upload</TabsTrigger>
-              <TabsTrigger value="url">URL</TabsTrigger>
             </TabsList>
 
             <TabsContent value="text">

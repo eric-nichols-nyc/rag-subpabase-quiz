@@ -172,6 +172,15 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
                   required
                 />
               </div>
+              {/* add select for number of questions */}
+              <div>
+                <Label htmlFor="numQuestions">Number of Questions</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select number of questions" />
+                  </SelectTrigger>
+                </Select>
+              </div>
               <Button 
                 type="submit" 
                 disabled={isLoading || quizId !== null}
