@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
 import { Header } from "@/components/header"
-
+import { siteConfig } from "@/config/site-config"
 import "./globals.css";
 import { ClerkProvider, SignInButton, SignedOut, SignedIn } from "@clerk/nextjs";
 const inter = Inter({ subsets: ["latin"] })
