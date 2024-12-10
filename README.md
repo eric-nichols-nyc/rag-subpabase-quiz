@@ -23,6 +23,8 @@ An AI-powered quiz generation application built with Next.js, Supabase, and Cler
 - **Backend**: Next.js API Routes
 - **Database**: Supabase
 - **Authentication**: Clerk
+- **AI/LLM**: LangChain.js with OpenAI
+- **Vector Store**: Supabase pgvector
 - **Styling**: Tailwind CSS
 - **State Management**: React Hooks
 - **Type Safety**: TypeScript
@@ -65,6 +67,27 @@ npm run dev
 ```
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+## RAG Implementation
+
+The application uses LangChain.js to implement Retrieval-Augmented Generation (RAG) for quiz creation:
+
+- **Document Processing**: 
+  - PDF parsing with `pdf-parse`
+  - Text chunking with LangChain's `RecursiveCharacterTextSplitter`
+  - URL content extraction with LangChain's `CheerioWebBaseLoader`
+
+- **Vector Storage**:
+  - Documents are embedded using OpenAI's embeddings
+  - Vectors are stored in Supabase using pgvector
+  - Efficient similarity search for relevant context retrieval
+
+- **Quiz Generation**:
+  - Context-aware prompting using LangChain's prompt templates
+  - OpenAI's GPT model for generating questions and explanations
+  - Structured output parsing for consistent quiz format
+
+This RAG approach ensures that generated quizzes are accurate and closely aligned with the source material.
 
 ## Project Structure
 
