@@ -1,5 +1,4 @@
 import { redirect } from "next/navigation"
-import { Header } from "@/components/header"
 import { GenerateQuizForm } from "@/components/generate-quiz-form"
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/server"
 import { auth } from "@clerk/nextjs/server"
@@ -25,7 +24,6 @@ export default async function GenerateQuizPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <main className="container mx-auto mt-8 p-4">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-bold mb-3">Generate Quiz</h1>

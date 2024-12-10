@@ -1,7 +1,6 @@
 //import { auth } from "@clerk/nextjs/server";
 //import { redirect } from "next/navigation";
 import { getQuizzesForUser } from "@/actions/actions";
-import { Header } from "@/components/header"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -33,7 +32,6 @@ export default async function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <main className="container mx-auto mt-8 p-4">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-bold mb-3">Your Quizzes</h1>

@@ -1,6 +1,5 @@
 "use client";
 
-import { Header } from "@/components/header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UrlUploadForm } from "@/components/url-upload-form";
 import { TextUploadForm } from "@/components/text-upload-form";
@@ -101,7 +100,6 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
       <main className="container mx-auto mt-8 p-4">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-bold mb-3">Upload Document</h1>
