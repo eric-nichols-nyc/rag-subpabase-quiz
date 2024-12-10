@@ -70,12 +70,10 @@ export async function POST(request: NextRequest) {
             messages: [
                 {
                     role: "system",
-                    content: `Generate ${numQuestions} multiple-choice questions based on the provided text. 
-                    Output a JSON object with 'questions' containing:
-                    - question (string)
-                    - correctAnswer (string)
-                    - incorrectAnswers (array of 3 strings)
-                }`
+                    content: `Generate ${numQuestions} multiple-choice questions from the text. Return a JSON object with 'questions', each containing:
+                  - question: string
+                  - correctAnswer: string
+                  - incorrectAnswers: array of 3 strings`
                 },
                 {
                     role: "user",
