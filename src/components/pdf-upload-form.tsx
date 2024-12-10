@@ -11,10 +11,13 @@ import * as pdfjsLib from 'pdfjs-dist';
 // Set up the worker for pdf.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+
 const pdfUploadSchema = z.object({
   title: z.string().min(1, "Title is required"),
   file: z.instanceof(File, { message: "PDF file is required" })
     .refine((file) => file.type === "application/pdf", "File must be a PDF")
+    .refine((file) => file.size <= MAX_FILE_SIZE, "File size must be less than 2MB")
 });
 
 export function PdfUploadForm() {
@@ -56,7 +59,16 @@ export function PdfUploadForm() {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
+    setError(null); // Clear any previous errors
+    
     if (selectedFile) {
+      // Check file size before processing
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        setError("File size must be less than 2MB");
+        e.target.value = ''; // Reset input
+        return;
+      }
+
       setFile(selectedFile);
       await extractPdfTitle(selectedFile);
     }
@@ -123,6 +135,9 @@ export function PdfUploadForm() {
               accept=".pdf"
               disabled={isUploading}
             />
+            <p className="text-sm text-muted-foreground">
+              Maximum file size: 2MB
+            </p>
           </div>
 
           <div className="space-y-2">
