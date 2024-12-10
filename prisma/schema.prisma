@@ -1,3 +1,5 @@
+// This is your Prisma schema file
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,157 +9,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id            String      @id // Clerk User ID
-  email         String      @unique
-  documents     Document[]
-  quizzes       Quiz[]
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-}
-
-model Document {
-  id            String      @id @default(cuid())
-  title         String
-  content       String      @db.Text
-  fileUrl       String?     // For PDFs or other files
-  sourceUrl     String?     // For website URLs
-  type          DocType
-  // Note: Vector type isn't directly supported in Prisma
-  // We'll use a raw query to handle the vector column
-  embedding     Unsupported("vector(1536)")?
-  topics        Topic[]
-  quizzes       Quiz[]
-  
-  // User relation
-  userId        String
-  user          User        @relation(fields: [userId], references: [id])
-  
-  // Chunks for long documents
-  chunks        DocumentChunk[]
-  
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  @@index([userId])
-}
-
-
-model DocumentChunk {
-  id            String      @id @default(cuid())
-  content       String      @db.Text
-  embedding     Unsupported("vector(1536)")?
-  
-  // Document relation
-  documentId    String
-  document      Document    @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  @@index([documentId])
-}
-
-enum DocType {
+enum DocumentType {
   PDF
-  URL
   TEXT
+  URL
+  YOUTUBE
 }
 
-model Topic {
-  id            String      @id @default(cuid())
-  name          String
-  documents     Document[]
-  quizzes       Quiz[]
-  
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  @@unique([name])
-}
-
-model Quiz {
-  id            String      @id @default(cuid())
-  title         String
-  description   String?
-  status        QuizStatus  @default(ACTIVE)
-  difficulty    Difficulty  @default(MEDIUM)
-  
-  // Relations
-  userId        String
-  user          User        @relation(fields: [userId], references: [id])
-  documents     Document[]  // Source documents used
-  topics        Topic[]     // Topics covered
-  questions     Question[]
-  attempts      QuizAttempt[]
-  
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  @@index([userId])
-}
-
-enum QuizStatus {
-  ACTIVE
-  ARCHIVED
-  DELETED
-}
-
-enum Difficulty {
+enum QuizDifficulty {
   EASY
   MEDIUM
   HARD
 }
 
+model Document {
+  id         String        @id @default(uuid()) @db.Uuid
+  title      String
+  content    String?
+  userId     String        @map("user_id")
+  type       DocumentType
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  chunks     DocumentChunk[]
+  quizzes    Quiz[]
+
+  @@map("documents")
+}
+
+model DocumentChunk {
+  id          String   @id @default(uuid()) @db.Uuid
+  documentId  String   @map("document_id") @db.Uuid
+  content     String
+  embedding     Unsupported("vector(1536)")?
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId])
+  @@map("document_chunks")
+  metadata Json?
+}
+
+model Quiz {
+  id          String         @id @default(uuid()) @db.Uuid
+  title       String
+  description String?
+  userId      String         @map("user_id")
+  documentId  String         @map("document_id") @db.Uuid
+  difficulty  QuizDifficulty @default(MEDIUM)
+  createdAt   DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  document    Document       @relation(fields: [documentId], references: [id])
+  questions   Question[]
+
+  @@index([userId])
+  @@map("quizzes")
+}
+
 model Question {
-  id            String      @id @default(cuid())
+  id            String   @id @default(uuid()) @db.Uuid
+  quizId        String   @map("quiz_id") @db.Uuid
   question      String
-  incorrectAnswers       String[]    // Multiple choice options
-  correctAnswer String
+  options       String[]
+  correctAnswer String   @map("correct_answer")
   explanation   String?
-  
-  // Quiz relation
-  quizId        String
-  quiz          Quiz        @relation(fields: [quizId], references: [id], onDelete: Cascade)
-  
-  // Track usage in attempts
-  responses     QuestionResponse[]
-  
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@index([quizId])
-}
-
-model QuizAttempt {
-  id            String      @id @default(cuid())
-  score         Int
-  completed     Boolean     @default(false)
-  
-  // Relations
-  quizId        String
-  quiz          Quiz        @relation(fields: [quizId], references: [id])
-  responses     QuestionResponse[]
-  
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
-
-  @@index([quizId])
-}
-
-model QuestionResponse {
-  id            String      @id @default(cuid())
-  selectedAnswer String
-  isCorrect     Boolean
-  
-  // Relations
-  questionId    String
-  question      Question    @relation(fields: [questionId], references: [id])
-  attemptId     String
-  attempt       QuizAttempt @relation(fields: [attemptId], references: [id])
-  
-  createdAt     DateTime    @default(now())
-
-  @@index([questionId])
-  @@index([attemptId])
+  @@map("questions")
 }

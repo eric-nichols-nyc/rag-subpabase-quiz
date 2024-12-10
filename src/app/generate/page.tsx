@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation"
-import { GenerateQuizForm } from "@/components/generate-quiz-form"
+import { GenerateQuizTabs } from "@/components/generate-quiz-form"
 import { createClerkSupabaseClientSsr } from "@/lib/supabase/server"
 import { auth } from "@clerk/nextjs/server"
 
@@ -33,7 +33,7 @@ export default async function GenerateQuizPage() {
             quiz will be tailored to your content, while topic-based quizzes draw from 
             our curated knowledge base.
           </p>
-          <GenerateQuizForm documents={documents} />
+          <GenerateQuizTabs documents={documents} />
         </div>
       </main>
     </div>

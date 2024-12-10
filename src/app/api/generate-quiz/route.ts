@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 2. Get document ID from request
-        const { documentId, numQuestions = 10, difficulty = 'HARD', title } = await request.json();
+        const { documentId, numQuestions = 8, difficulty = 'HARD', title } = await request.json();
         if (!documentId) {
             return NextResponse.json({ error: "Document ID is required" }, { status: 400 });
         }

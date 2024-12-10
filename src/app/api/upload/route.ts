@@ -29,25 +29,25 @@ export async function POST(request: NextRequest) {
     }
 
 
-    // Handle text content upload
+    // Handle text area upload
     if (content && content.length > 0) {
-      const { data: docData, error: docError } = await supabase
+      const { data: textData, error: textError } = await supabase
         .from('documents')
         .insert({
           title,
-          content:title,
+          content:content,
           user_id:userId,
           type: 'TEXT',
         })
         .select()
         .single()
 
-        if (docError){
-          console.log('docError = ', docError)
-          throw docError  
+        if (textError){
+          console.log('docError = ', textError)
+          throw textError  
         }
 
-        console.log('docData = ', docData)
+        console.log('textData = ', textData)
 
         const splitter = new RecursiveCharacterTextSplitter({
           chunkSize: 1000,
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         const chunkPromises = chunks.map(async (chunk, i) => {
           const embedding = await embeddings.embedQuery(chunk)
           return supabase.from('document_chunks').insert({
-            document_id: docData.id,
+            document_id: textData.id,
             metadata: JSON.stringify({
               source: 'text-input',
               position: i
@@ -74,12 +74,12 @@ export async function POST(request: NextRequest) {
         console.log('done adding test chunks= ', done)
 
 
-      if (docError) throw docError
+      if (textData) throw textError
 
       return NextResponse.json({ 
         success: true, 
         message: "Text content stored",
-        documentId: docData.id
+        documentId: textData.id
       })
     }
 
@@ -90,6 +90,25 @@ export async function POST(request: NextRequest) {
     await writeFile(tempPath, buffer)
     const loader = new PDFLoader(tempPath)
     const docs = await loader.load()
+
+    // Combine all pages' content
+    const pdfContent = docs.map(doc => doc.pageContent).join('\n')
+
+    // Store document with content
+    const { data: pdfData, error: pdfError } = await supabase
+      .from('documents')
+      .insert({
+        title,
+        user_id: userId,
+        content: pdfContent,
+        type: 'PDF',
+      })
+      .select()
+      .single()
+
+    if (pdfError) throw pdfError
+
+    console.log('1. pdfData = ', pdfData)
 
     // 4. split the docs into chunks
     const splitter = new RecursiveCharacterTextSplitter({

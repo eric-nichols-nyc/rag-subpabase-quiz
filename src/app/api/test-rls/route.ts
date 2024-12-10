@@ -37,7 +37,8 @@ export async function GET() {
       .from('documents')
       .insert({
         title: "Test Document",
-        user_id: userId
+        user_id: userId,
+        content: "Test content"
       })
       .select()
       .single()
