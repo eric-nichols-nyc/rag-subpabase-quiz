@@ -62,6 +62,11 @@ export async function POST(request: NextRequest) {
 
         // Combine chunks for processing
         const fullContent = chunks.map(chunk => chunk.content).join(' ');
+        const trimContent = (content: string, maxWords = 1000) => {
+            return content.split(' ').slice(0, maxWords).join(' ');
+        };
+
+        const trimmedContent = trimContent(fullContent);
         const startTime = Date.now();
 
         // 4. Generate quiz using OpenAI
@@ -77,7 +82,7 @@ export async function POST(request: NextRequest) {
                 },
                 {
                     role: "user",
-                    content: fullContent
+                    content: trimmedContent
                 }
             ],
             response_format: { type: "json_object" },
@@ -94,7 +99,7 @@ export async function POST(request: NextRequest) {
         }
         const endTime = Date.now();
         const duration = endTime - startTime;
-  
+
         console.log(`API call duration: ${duration} ms`);
         console.log('Quiz:', quiz);
 
