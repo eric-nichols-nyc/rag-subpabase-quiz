@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
+import { Header } from "@/components/header"
 
 import "./globals.css";
-import { ClerkProvider, SignInButton, SignedOut } from "@clerk/nextjs";
+import { ClerkProvider, SignInButton, SignedOut, SignedIn } from "@clerk/nextjs";
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -19,13 +20,21 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-      <body className={inter.className}>
+        <body className={inter.className}>
           <SignedOut>
-            <SignInButton />
+            <div className="flex min-h-screen flex-col items-center justify-center">
+              <SignInButton />
+            </div>
           </SignedOut>
-          {children}
+          <SignedIn>
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1 container mx-auto p-6">
+                {children}
+              </main>
+            </div>
+          </SignedIn>
           <Toaster />
-
         </body>
       </html>
     </ClerkProvider>
