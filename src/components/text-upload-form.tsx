@@ -9,7 +9,9 @@ import { z } from "zod";
 
 const textUploadSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  content: z.string().min(100, "Content must be at least 100 characters long")
+  content: z.string()
+    .min(300, "Content must be at least 300 characters long")
+    .max(50000, "Content cannot exceed 50,000 characters")
 });
 
 interface TextUploadFormProps {
@@ -70,7 +72,9 @@ export function TextUploadForm({ onSubmit }: TextUploadFormProps) {
               required
             />
             <p className="text-sm text-muted-foreground">
-              Minimum 100 characters required. {content.length}/100 characters
+              {content.length < 100 ? "Minimum 100 characters required" : 
+               content.length > 50000 ? "Content exceeds maximum length" :
+               "Content length acceptable"} ({content.length}/50,000 characters)
             </p>
           </div>
 

@@ -31,6 +31,14 @@ export async function POST(request: NextRequest) {
 
     // Handle text area upload
     if (content && content.length > 0) {
+      // Add content length validation
+      if (content.length < 100) {
+        return NextResponse.json({ error: "Content must be at least 100 characters long" }, { status: 400 })
+      }
+      if (content.length > 50000) {
+        return NextResponse.json({ error: "Content cannot exceed 50,000 characters" }, { status: 400 })
+      }
+
       const { data: textData, error: textError } = await supabase
         .from('documents')
         .insert({
@@ -74,7 +82,7 @@ export async function POST(request: NextRequest) {
         console.log('done adding test chunks= ', done)
 
 
-      if (textData) throw textError
+      if (textError) throw textError
 
       return NextResponse.json({ 
         success: true, 
