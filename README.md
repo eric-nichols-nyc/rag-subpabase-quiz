@@ -2,6 +2,8 @@
 
 An AI-powered quiz generation application built with Next.js, Supabase, and Clerk authentication. This application allows users to create custom quizzes from various content sources including PDFs, text, and URLs.
 
+![RAG Quiz Generator Demo](https://placehold.co/600x400?text=RAG+Quiz+Generator+Demo)
+
 ## Features
 
 - 📝 Generate quizzes from multiple content sources:
