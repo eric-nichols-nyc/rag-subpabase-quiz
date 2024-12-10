@@ -4,16 +4,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UrlUploadForm } from "@/components/url-upload-form";
 import { TextUploadForm } from "@/components/text-upload-form";
 import { PdfUploadForm } from "@/components/pdf-upload-form";
-import { useRouter } from "next/navigation";
 
 export default function UploadPage() {
-  const router = useRouter();
-
-  const handleDocumentUploaded = (documentId: string) => {
-    // Optionally handle successful upload, e.g., redirect to the document page
-    router.push(`/documents/${documentId}`);
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <main className="container mx-auto mt-8 p-4">
@@ -34,15 +26,15 @@ export default function UploadPage() {
             </TabsList>
 
             <TabsContent value="text">
-              <TextUploadForm onSubmit={handleDocumentUploaded} />
+              <TextUploadForm />
             </TabsContent>
 
             <TabsContent value="pdf">
-              <PdfUploadForm onSubmit={handleDocumentUploaded} />
+              <PdfUploadForm />
             </TabsContent>
 
             <TabsContent value="url">
-              <UrlUploadForm onSubmit={handleDocumentUploaded} />
+              <UrlUploadForm />
             </TabsContent>
           </Tabs>
         </div>

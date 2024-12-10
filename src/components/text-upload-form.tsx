@@ -14,11 +14,7 @@ const textUploadSchema = z.object({
     .max(50000, "Content cannot exceed 50,000 characters")
 });
 
-interface TextUploadFormProps {
-  onSubmit?: (documentId: string) => void;
-}
-
-export function TextUploadForm({ onSubmit }: TextUploadFormProps) {
+export function TextUploadForm() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -48,15 +44,11 @@ export function TextUploadForm({ onSubmit }: TextUploadFormProps) {
         throw new Error(error || "Upload failed");
       }
 
-      const data = await response.json();
       toast.success("Document uploaded and processed");
       
       // Reset form
       setTitle("");
       setContent("");
-      
-      // Notify parent component if callback provided
-      onSubmit?.(data.documentId);
       
     } catch (error: unknown) {
       console.error(error);

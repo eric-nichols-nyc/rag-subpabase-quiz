@@ -17,11 +17,7 @@ const pdfUploadSchema = z.object({
     .refine((file) => file.type === "application/pdf", "File must be a PDF")
 });
 
-interface PdfUploadFormProps {
-  onSubmit?: (documentId: string) => void;  // Optional callback for parent component
-}
-
-export function PdfUploadForm({ onSubmit }: PdfUploadFormProps) {
+export function PdfUploadForm() {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -94,7 +90,6 @@ export function PdfUploadForm({ onSubmit }: PdfUploadFormProps) {
         throw new Error(error || "Upload failed");
       }
 
-      const data = await response.json();
       toast.success("PDF uploaded and processed");
 
       // Reset form
@@ -102,9 +97,6 @@ export function PdfUploadForm({ onSubmit }: PdfUploadFormProps) {
       setFile(null);
       const fileInput = document.getElementById('pdf-file') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
-      
-      // Notify parent component if callback provided
-      onSubmit?.(data.documentId);
 
     } catch (error: unknown) {
       console.error(error);

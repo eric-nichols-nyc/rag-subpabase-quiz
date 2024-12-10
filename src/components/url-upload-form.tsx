@@ -13,11 +13,7 @@ const urlSchema = z.object({
   title: z.string().min(1, "Title is required"),
 });
 
-interface UrlUploadFormProps {
-  onSubmit?: (documentId: string) => void;  // Optional callback for parent component
-}
-
-export function UrlUploadForm({ onSubmit }: UrlUploadFormProps) {
+export function UrlUploadForm() {
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -108,9 +104,6 @@ export function UrlUploadForm({ onSubmit }: UrlUploadFormProps) {
       // Reset form
       setUrl("");
       setTitle("");
-      
-      // Notify parent component if callback provided
-      onSubmit?.(data.documentId);
 
     } catch (error: unknown) {
       console.error(error);
