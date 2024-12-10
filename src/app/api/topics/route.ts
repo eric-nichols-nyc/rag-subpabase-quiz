@@ -13,8 +13,15 @@ interface ChunkResult {
     document_id: string;
     created_at: string;
     updated_at: string;
-    metadata: any;
+    metadata: unknown;
     similarity: number;
+}
+
+interface QuizQuestion {
+    question: string;
+    correctAnswer: string;
+    incorrectAnswers: string[];
+    explanation: string;
 }
 
 const MIN_CHUNKS_REQUIRED = 2;
@@ -143,7 +150,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Store the questions
-        const questionsData = quizContent.questions.map(q => ({
+        const questionsData = quizContent.questions.map((q: QuizQuestion) => ({
             quiz_id: quiz.id,
             question: q.question,
             correct_answer: q.correctAnswer,

@@ -14,6 +14,7 @@ export function QuizQuestion({
   onAnswerSelected, 
   userAnswer 
 }: QuestionProps) {
+  console.log('question', question);
   const shuffleArray = (array: string[]) => {
     const newArray = [...array];
     for (let i = newArray.length - 1; i > 0; i--) {

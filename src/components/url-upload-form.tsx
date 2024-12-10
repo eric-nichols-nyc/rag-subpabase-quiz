@@ -65,6 +65,7 @@ export function UrlUploadForm({ onSubmit }: UrlUploadFormProps) {
         new URL(newUrl); // Validate URL
         await extractTitleFromUrl(newUrl);
       } catch (error) {
+        console.error('Error validating URL:', error);
         // Invalid URL, ignore
       }
     }

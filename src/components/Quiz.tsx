@@ -52,7 +52,7 @@ export function Quiz({ quizData }: QuizProps) {
     return (
       <div className="text-center p-8">
         <h2 className="text-xl font-semibold">No questions available</h2>
-        <p className="text-muted-foreground mt-2">This quiz doesn't have any questions yet.</p>
+        <p className="text-muted-foreground mt-2">This quiz doesn&apos;t have any questions yet.</p>
       </div>
     )
   }

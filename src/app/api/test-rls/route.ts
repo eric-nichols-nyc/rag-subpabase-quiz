@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import { auth } from "@clerk/nextjs/server"
 
@@ -13,7 +13,7 @@ const supabase = createClient(
 )
 
 // Test endpoint: /api/test-rls
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
     const { userId } = auth()
     if (!userId) {
@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Test 1: Insert Document
-    const { data: doc, error: docError } = await supabase
+    const { error: docError } = await supabase
       .from('documents')
       .insert({
         title: "Test Document",
@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     if (docError) testResults.errors.push({ test: "Insert Document", error: docError.message })
 
     // Test 2: Insert Quiz
-    const { data: quiz, error: quizError } = await supabase
+    const { error: quizError } = await supabase
       .from('quizzes')
       .insert({
         title: "Test Quiz",
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     if (quizError) testResults.errors.push({ test: "Insert Quiz", error: quizError.message })
 
     // Test 3: Select Documents
-    const { data: docs, error: selectDocError } = await supabase
+    const { error: selectDocError } = await supabase
       .from('documents')
       .select()
       .eq('user_id', userId)
@@ -69,7 +69,7 @@ export async function GET(req: NextRequest) {
     if (selectDocError) testResults.errors.push({ test: "Select Documents", error: selectDocError.message })
 
     // Test 4: Select Quizzes
-    const { data: quizzes, error: selectQuizError } = await supabase
+    const { error: selectQuizError } = await supabase
       .from('quizzes')
       .select()
       .eq('user_id', userId)

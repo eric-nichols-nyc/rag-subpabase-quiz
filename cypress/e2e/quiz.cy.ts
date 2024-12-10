@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 describe('Quiz Flow', () => {
   beforeEach(() => {
     // Visit the quiz page with a known test quiz ID

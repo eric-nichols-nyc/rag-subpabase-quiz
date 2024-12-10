@@ -27,7 +27,6 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [title, setTitle] = useState("")
   const [numQuestions, setNumQuestions] = useState(5)
-  const [difficulty, setDifficulty] = useState("MEDIUM")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -187,19 +186,6 @@ export function GenerateQuizForm({ documents }: GenerateQuizFormProps) {
                   placeholder="Enter number of questions"
                   required
                 />
-                </div>
-                <div className="flex flex-col flex-1">
-                <Label htmlFor="difficulty">Difficulty</Label>
-                <Select value={difficulty} onValueChange={setDifficulty}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select difficulty" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="EASY">Easy</SelectItem>
-                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                    <SelectItem value="HARD">Hard</SelectItem>
-                  </SelectContent>
-                  </Select>
                 </div>
               </div>
               <Button 
