@@ -1,7 +1,7 @@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Question } from '../types/quiz'
+import { Question } from '@/types/quiz'
 
 interface QuestionProps {
   question: Question;
