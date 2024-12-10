@@ -18,7 +18,7 @@ const pdfUploadSchema = z.object({
 });
 
 interface PdfUploadFormProps {
-  onSubmit: (title: string, file: File) => Promise<boolean>;
+  onSubmit?: (documentId: string) => void;  // Optional callback for parent component
 }
 
 export function PdfUploadForm({ onSubmit }: PdfUploadFormProps) {
@@ -80,14 +80,37 @@ export function PdfUploadForm({ onSubmit }: PdfUploadFormProps) {
 
     setIsUploading(true);
     try {
-      const success = await onSubmit(title, file);
-      if (success) {
-        setTitle("");
-        setFile(null);
-        // Reset the file input
-        const fileInput = document.getElementById('pdf-file') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || "Upload failed");
       }
+
+      const data = await response.json();
+      toast.success("PDF uploaded and processed");
+
+      // Reset form
+      setTitle("");
+      setFile(null);
+      const fileInput = document.getElementById('pdf-file') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
+      
+      // Notify parent component if callback provided
+      onSubmit?.(data.documentId);
+
+    } catch (error: unknown) {
+      console.error(error);
+      toast.error("Upload failed", {
+        description: error instanceof Error ? error.message : "Please try again later.",
+      });
     } finally {
       setIsUploading(false);
     }

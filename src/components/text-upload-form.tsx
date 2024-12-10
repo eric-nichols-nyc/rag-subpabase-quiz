@@ -15,7 +15,7 @@ const textUploadSchema = z.object({
 });
 
 interface TextUploadFormProps {
-  onSubmit: (title: string, content: string) => Promise<boolean>;
+  onSubmit?: (documentId: string) => void;
 }
 
 export function TextUploadForm({ onSubmit }: TextUploadFormProps) {
@@ -34,11 +34,35 @@ export function TextUploadForm({ onSubmit }: TextUploadFormProps) {
 
     setIsProcessing(true);
     try {
-      const success = await onSubmit(title, content);
-      if (success) {
-        setTitle("");
-        setContent("");
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("content", content);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || "Upload failed");
       }
+
+      const data = await response.json();
+      toast.success("Document uploaded and processed");
+      
+      // Reset form
+      setTitle("");
+      setContent("");
+      
+      // Notify parent component if callback provided
+      onSubmit?.(data.documentId);
+      
+    } catch (error: unknown) {
+      console.error(error);
+      toast.error("Upload failed", {
+        description: error instanceof Error ? error.message : "Please try again later.",
+      });
     } finally {
       setIsProcessing(false);
     }

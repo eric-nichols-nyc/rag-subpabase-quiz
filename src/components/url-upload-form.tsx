@@ -14,7 +14,7 @@ const urlSchema = z.object({
 });
 
 interface UrlUploadFormProps {
-  onSubmit: (url: string, title: string) => Promise<boolean>;
+  onSubmit?: (documentId: string) => void;  // Optional callback for parent component
 }
 
 export function UrlUploadForm({ onSubmit }: UrlUploadFormProps) {
@@ -74,7 +74,6 @@ export function UrlUploadForm({ onSubmit }: UrlUploadFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate URL and title
     const validatedData = urlSchema.safeParse({ url, title });
     if (!validatedData.success) {
       toast.error(validatedData.error.errors[0].message);
@@ -83,11 +82,43 @@ export function UrlUploadForm({ onSubmit }: UrlUploadFormProps) {
 
     setIsProcessing(true);
     try {
-      const success = await onSubmit(validatedData.data.url, validatedData.data.title);
-      if (success) {
-        setUrl("");
-        setTitle("");
+      const response = await fetch("/api/scrape", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ 
+          url: validatedData.data.url, 
+          title: validatedData.data.title 
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Processing failed");
       }
+
+      toast.success(
+        url.includes("youtube.com") || url.includes("youtu.be")
+          ? "YouTube transcript processed and stored"
+          : "URL content processed and stored"
+      );
+
+      // Reset form
+      setUrl("");
+      setTitle("");
+      
+      // Notify parent component if callback provided
+      onSubmit?.(data.documentId);
+
+    } catch (error: unknown) {
+      console.error(error);
+      toast.error("Processing failed", {
+        description: error instanceof Error 
+          ? error.message 
+          : "Please try again later. If the problem persists, try a different URL.",
+      });
     } finally {
       setIsProcessing(false);
     }

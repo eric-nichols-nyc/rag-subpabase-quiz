@@ -4,98 +4,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UrlUploadForm } from "@/components/url-upload-form";
 import { TextUploadForm } from "@/components/text-upload-form";
 import { PdfUploadForm } from "@/components/pdf-upload-form";
-import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function UploadPage() {
-  const handleTextSubmit = async (title: string, content: string) => {
-    try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("content", content);
+  const router = useRouter();
 
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || "Upload failed");
-      }
-
-      toast.success("Document uploaded and processed");
-      return true;
-    } catch (error: unknown) {
-      console.error(error);
-      toast.error("Upload failed", {
-        description:
-          error instanceof Error ? error.message : "Please try again later.",
-      });
-      return false;
-    }
-  };
-
-  const handleUrlSubmit = async (url: string, title: string) => {
-    try {
-      const response = await fetch("/api/scrape", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ url, title }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Processing failed");
-      }
-
-      toast.success(
-        url.includes("youtube.com") || url.includes("youtu.be")
-          ? "YouTube transcript processed and stored"
-          : "URL content processed and stored"
-      );
-
-      return true;
-    } catch (error: unknown) {
-      console.error(error);
-      toast.error("Processing failed", {
-        description:
-          error instanceof Error
-            ? error.message
-            : "Please try again later. If the problem persists, try a different URL.",
-      });
-      return false;
-    }
-  };
-
-  const handlePdfSubmit = async (title: string, file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append("title", title);
-      formData.append("file", file);
-
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || "Upload failed");
-      }
-
-      toast.success("PDF uploaded and processed");
-      return true;
-    } catch (error: unknown) {
-      console.error(error);
-      toast.error("Upload failed", {
-        description:
-          error instanceof Error ? error.message : "Please try again later.",
-      });
-      return false;
-    }
+  const handleDocumentUploaded = (documentId: string) => {
+    // Optionally handle successful upload, e.g., redirect to the document page
+    router.push(`/documents/${documentId}`);
   };
 
   return (
@@ -112,21 +28,21 @@ export default function UploadPage() {
 
           <Tabs defaultValue="url" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="url">URL</TabsTrigger>
+              <TabsTrigger value="url">URL</TabsTrigger>
               <TabsTrigger value="text">Text Content</TabsTrigger>
               <TabsTrigger value="pdf">PDF Upload</TabsTrigger>
             </TabsList>
 
             <TabsContent value="text">
-              <TextUploadForm onSubmit={handleTextSubmit} />
+              <TextUploadForm onSubmit={handleDocumentUploaded} />
             </TabsContent>
 
             <TabsContent value="pdf">
-              <PdfUploadForm onSubmit={handlePdfSubmit} />
+              <PdfUploadForm onSubmit={handleDocumentUploaded} />
             </TabsContent>
 
             <TabsContent value="url">
-              <UrlUploadForm onSubmit={handleUrlSubmit} />
+              <UrlUploadForm onSubmit={handleDocumentUploaded} />
             </TabsContent>
           </Tabs>
         </div>
