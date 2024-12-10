@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
 import { AlertCircle, Link, Youtube } from "lucide-react";
 import { z } from "zod";
 import { isYoutubeUrl } from '@/lib/utils';
@@ -17,6 +16,8 @@ export function UrlUploadForm() {
   const [url, setUrl] = useState("");
   const [title, setTitle] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const extractTitleFromUrl = async (url: string) => {
     try {
@@ -69,10 +70,12 @@ export function UrlUploadForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(false);
 
     const validatedData = urlSchema.safeParse({ url, title });
     if (!validatedData.success) {
-      toast.error(validatedData.error.errors[0].message);
+      setError(validatedData.error.errors[0].message);
       return;
     }
 
@@ -95,11 +98,7 @@ export function UrlUploadForm() {
         throw new Error(data.error || "Processing failed");
       }
 
-      toast.success(
-        url.includes("youtube.com") || url.includes("youtu.be")
-          ? "YouTube transcript processed and stored"
-          : "URL content processed and stored"
-      );
+      setSuccess(true);
 
       // Reset form
       setUrl("");
@@ -107,11 +106,9 @@ export function UrlUploadForm() {
 
     } catch (error: unknown) {
       console.error(error);
-      toast.error("Processing failed", {
-        description: error instanceof Error 
-          ? error.message 
-          : "Please try again later. If the problem persists, try a different URL.",
-      });
+      setError(error instanceof Error 
+        ? error.message 
+        : "Failed to process URL. Please try again later or try a different URL.");
     } finally {
       setIsProcessing(false);
     }
@@ -173,6 +170,21 @@ export function UrlUploadForm() {
           <Button type="submit" disabled={isProcessing} className="w-full">
             {isProcessing ? "Processing..." : "Process"}
           </Button>
+
+          {error && (
+            <div className="flex items-center gap-2 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              <span>{error}</span>
+            </div>
+          )}
+          
+          {success && (
+            <div className="text-sm text-green-600">
+              {url.includes("youtube.com") || url.includes("youtu.be")
+                ? "YouTube transcript successfully processed and stored"
+                : "URL content successfully processed and stored"}
+            </div>
+          )}
         </form>
       </CardContent>
     </Card>

@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
 import { z } from "zod";
 
 const textUploadSchema = z.object({
@@ -18,13 +18,17 @@ export function TextUploadForm() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(false);
 
     const validatedData = textUploadSchema.safeParse({ title, content });
     if (!validatedData.success) {
-      toast.error(validatedData.error.errors[0].message);
+      setError(validatedData.error.errors[0].message);
       return;
     }
 
@@ -44,7 +48,7 @@ export function TextUploadForm() {
         throw new Error(error || "Upload failed");
       }
 
-      toast.success("Document uploaded and processed");
+      setSuccess(true);
       
       // Reset form
       setTitle("");
@@ -52,9 +56,7 @@ export function TextUploadForm() {
       
     } catch (error: unknown) {
       console.error(error);
-      toast.error("Upload failed", {
-        description: error instanceof Error ? error.message : "Please try again later.",
-      });
+      setError(error instanceof Error ? error.message : "Failed to upload text. Please try again later.");
     } finally {
       setIsProcessing(false);
     }
@@ -97,6 +99,19 @@ export function TextUploadForm() {
           <Button type="submit" disabled={isProcessing} className="w-full">
             {isProcessing ? "Processing..." : "Process"}
           </Button>
+
+          {error && (
+            <div className="flex items-center gap-2 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              <span>{error}</span>
+            </div>
+          )}
+          
+          {success && (
+            <div className="text-sm text-green-600">
+              Text content successfully uploaded and processed
+            </div>
+          )}
         </form>
       </CardContent>
     </Card>

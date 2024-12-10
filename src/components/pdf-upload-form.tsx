@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
 import { FileUp } from "lucide-react";
 import { z } from "zod";
 import * as pdfjsLib from 'pdfjs-dist';
@@ -21,6 +21,8 @@ export function PdfUploadForm() {
   const [title, setTitle] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   const extractPdfTitle = async (file: File) => {
     try {
@@ -62,15 +64,17 @@ export function PdfUploadForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(false);
 
     if (!file) {
-      toast.error("Please select a PDF file");
+      setError("Please select a PDF file");
       return;
     }
 
     const validatedData = pdfUploadSchema.safeParse({ title, file });
     if (!validatedData.success) {
-      toast.error(validatedData.error.errors[0].message);
+      setError(validatedData.error.errors[0].message);
       return;
     }
 
@@ -90,7 +94,7 @@ export function PdfUploadForm() {
         throw new Error(error || "Upload failed");
       }
 
-      toast.success("PDF uploaded and processed");
+      setSuccess(true);
 
       // Reset form
       setTitle("");
@@ -100,9 +104,7 @@ export function PdfUploadForm() {
 
     } catch (error: unknown) {
       console.error(error);
-      toast.error("Upload failed", {
-        description: error instanceof Error ? error.message : "Please try again later.",
-      });
+      setError(error instanceof Error ? error.message : "Failed to upload PDF. Please try again later.");
     } finally {
       setIsUploading(false);
     }
@@ -144,6 +146,19 @@ export function PdfUploadForm() {
               </>
             )}
           </Button>
+
+          {error && (
+            <div className="flex items-center gap-2 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              <span>{error}</span>
+            </div>
+          )}
+          
+          {success && (
+            <div className="text-sm text-green-600">
+              PDF successfully uploaded and processed
+            </div>
+          )}
         </form>
       </CardContent>
     </Card>
