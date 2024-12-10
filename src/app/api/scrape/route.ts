@@ -60,8 +60,6 @@ export async function POST(request: NextRequest) {
       .insert({
         title: title || 'Untitled Document',
         user_id: userId,
-        file_name: url,
-        file_url: url, 
         type: 'URL',
         content
       })
