@@ -29,6 +29,7 @@ export function Quiz({ quizData }: QuizProps) {
   }
 
   const goToPreviousQuestion = () => {
+    console.log('currentQuestionIndex', currentQuestionIndex)
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1)
     }
